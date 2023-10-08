@@ -1,0 +1,42 @@
+@port = 5101
+@host = https://localhost:{{port}}
+@contentType = application/json
+@createdAt = {{$datetime iso8601}}
+@modifiedBy = {{$processEnv USERNAME}}
+
+###
+
+GET {{host}}/pizzas
+
+###
+GET https://localhost:5101/Pizzas/1
+###
+
+POST {{host}}/pizzas HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+   "name":"Hawaii", 
+   "price": 135
+}
+###
+
+GET {{host}}/err
+###
+
+GET {{host}}/pizzas/700
+
+###
+
+PUT {{host}}/pizzas/3 HTTP/1.1
+Content-Type: {{contentType}}
+
+{
+    "name": "Сырная",
+    "price": 175,
+    "description": "много сыра"
+}
+
+###
+
+DELETE  {{host}}/pizzas/57

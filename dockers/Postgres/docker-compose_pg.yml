@@ -1,0 +1,65 @@
+version: "3"
+
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer
+    ports:
+      - ${PORTAINER_PORT}:9000
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+    networks:
+      - pragreports      
+
+  postgres:
+    container_name: postgres
+    image: postgres
+    environment:
+    - PGDATA=/data/postgres 
+    - POSTGRES_USER=${POSTGRES_USER} 
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:5432      
+    volumes:
+      - postgres:/data/postgres
+      - ./data:/data/postgres
+      # - dbdata:/var/opt/sqlserver      
+      - ./logs:${MSSQL_LOG_DIR}
+      - ./backup:${MSSQL_BACKUP_DIR}
+
+    networks:
+      - pragreports
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}      
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - ${PGADMIN_PORT}:80
+    networks:
+      - pragreports
+    restart: unless-stopped
+
+volumes:
+  portainer:
+    driver: local
+  postgres:
+    driver: local
+  pgadmin:
+    driver: local
+
+networks:
+    pragreports:    
+# networks:
+#   pragreports:
+#     external:
+#       name: pragreports_default

@@ -1,0 +1,38 @@
+version: '3'
+services:
+  webapp:
+    container_name: webapp-test  
+    build:
+      context: ../src
+      dockerfile: Dockerfile_WebApp    
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=https://+:443;http://+:80        
+      - ASPNETCORE_URLS=http://+:80        
+    ports: 
+      - "8090:80"
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.10
+
+  webapp_api:
+    container_name: webapp-api
+    build:
+      context: ../src
+      dockerfile: Dockerfile_WebAppApi    
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      # - ASPNETCORE_URLS=https://+:443;http://+:80        
+      - ASPNETCORE_URLS=http://+:80        
+    ports: 
+      - "8080:80"
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.11
+
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.240.0/24

@@ -1,0 +1,43 @@
+version: '3'
+services:
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: unless-stopped
+    environment:
+    - PGDATA=/data/postgres 
+    - POSTGRES_USER=${POSTGRES_USER} 
+    - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT}:5432      
+    volumes:
+      # - postgres:/data/postgres
+      - ./data:/data/postgres
+      # - dbdata:/var/opt/sqlserver      
+      - ./logs:${MSSQL_LOG_DIR}
+      - ./backup:${MSSQL_BACKUP_DIR}
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.20
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}      
+    depends_on:
+      - postgres
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - ${PGADMIN_PORT}:80
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.21
+
+volumes:
+  postgres:
+    driver: local
+  pgadmin:
+    driver: local

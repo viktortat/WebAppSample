@@ -1,0 +1,4 @@
+*.backup
+*.terraform
+*.tfstate
+*.tfstate.backup

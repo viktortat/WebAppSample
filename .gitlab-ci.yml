@@ -1,0 +1,56 @@
+# image: mcr.microsoft.com/dotnet/sdk:latest
+image: mcr.microsoft.com/dotnet/sdk:5.0
+
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  test: "WebApp.Tests"
+
+before_script:
+  - "cd src/WebApp.Api/"
+  - "dotnet restore"
+
+build-job:
+  stage: build
+  script:
+    - "dotnet build"
+    - echo "Hello, $GITLAB_USER_LOGIN! Build project"
+
+release:
+  stage: deploy
+  # only:
+  #   - master
+  artifacts:
+    expire_in: 7 day
+    paths:
+      - publish/
+  script:
+    # The output path is relative to the position of the csproj-file
+    - dotnet publish -c Release -o ../../publish WebApp.Api.csproj    
+
+test_results:
+  before_script:
+    - "echo | dotnet --version" # must be v 2.2.300 or later for reporter tool to work
+    - "cd tests/WebApp.Tests/"
+    - "ls -la"
+    # - dotnet tool install dotnet-reportgenerator-globaltool --tool-path tools
+  stage: test
+  script:
+    - dotnet test 
+    # - dotnet test --logger "junit" --collect:"XPlat Code Coverage"
+#     # each reporttype must be a separate line, doesn't work together ; separated
+#     # - echo ${CI_PROJECT_DIR}
+#     # - ls -ld ./**/TestResults/*
+#     - ./tools/reportgenerator "-reports:./**/TestResults/*/coverage.cobertura.xml" "-targetdir:Reports_Coverage" -reportTypes:TextSummary;
+#     - ./tools/reportgenerator "-reports:./**/TestResults/*/coverage.cobertura.xml" "-targetdir:Reports_Coverage" -reportTypes:Html;
+#     # - ls Reports_Coverage
+#     - cat ./Reports_Coverage/Summary.txt
+#     - echo 'End Summary'
+#   # coverage: /Line coverage[\s\S].+%/
+#   artifacts:
+#     expire_in: 4 day
+#     paths:
+#       - src/WebApp.Api/Reports_Coverage/    

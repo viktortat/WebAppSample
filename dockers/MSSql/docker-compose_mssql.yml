@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    hostname: my-mssql
+    volumes:
+      - ./data:${MSSQL_DATA_DIR}
+      # - ${PWD}/dbdata:/var/opt/mssql/data  
+      # - dbdata:/var/opt/sqlserver      
+      - ./logs:${MSSQL_LOG_DIR}
+      - ./backup:${MSSQL_BACKUP_DIR}
+    restart: always
+    ports:
+      - ${MSSQL_PORT}:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${MSSQL_PASSWORD}
+
+volumes:
+  dbdata:      
+  

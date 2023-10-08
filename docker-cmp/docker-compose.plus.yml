@@ -1,0 +1,67 @@
+version: '3'
+services:
+  portainer:
+    container_name: portainer
+    image: portainer/portainer
+    ports:
+      - ${PORTAINER_PORT}:9000
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer:/data
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.30
+
+ 
+  zipkin: 
+    image: "openzipkin/zipkin"
+    ports:
+    - "9412:9411"
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.31
+  
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml' 
+      - '--web.listen-address=:8081'
+      # - '--net=host'
+    ports:
+      - "8081:8081"
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.32
+
+  grafana:
+    image: grafana/grafana
+    volumes:
+      - type: volume
+        source: grafana-storage
+        target: /var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=pass
+      - GF_SMTP_HOST=localhost:25
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_FROM_ADDRESS=alert@retrogamingwebapi.com
+      - GF_SMTP_SKIP_VERIFY=true
+      - GF_EXTERNAL_IMAGE_STORAGE_PROVIDER=azure_blob
+      - GF_EXTERNAL_IMAGE_STORAGE_AZURE_BLOB_ACCOUNT_NAME=...
+      - GF_EXTERNAL_IMAGE_STORAGE_AZURE_BLOB_ACCOUNT_KEY=...
+      - GF_EXTERNAL_IMAGE_STORAGE_AZURE_BLOB_CONTAINER_NAME=grafananotifications
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
+    networks:
+      app-network:
+        ipv4_address: 192.168.240.33
+
+volumes:
+  grafana-storage:
+    driver: local
+  portainer:
+    driver: local
