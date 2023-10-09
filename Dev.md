@@ -17,21 +17,7 @@ get WeatherForecast
 exit
 ```
 ----
-# Работа c докером для WebAppApi
-```sh
-docker build -f src/Dockerfile_WebAppApi -t devtest src/.
-docker run --rm -it -p 443:443/tcp -p 8080:80 devtest
-http://localhost:8080/
-http://localhost:8080/WeatherForecast
-```
-## Отправка его не GitLab
-```
-docker login registry.gitlab.com
-docker build -f src/Dockerfile_WebAppApi -t registry.gitlab.com/viktortat/appcore50/WebAppApi src/.
-docker push registry.gitlab.com/viktortat/appcore50/WebAppApi:001
-docker run --rm -it -p 443:443/tcp -p 8080:80 registry.gitlab.com/viktortat/appcore50/WebAppApi:001  
-http://localhost:8080/  
-```
+
 
 ```
 cd docker-cmp/

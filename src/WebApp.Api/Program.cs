@@ -14,18 +14,27 @@ const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 try
 {
-      Log.Logger = new LoggerConfiguration()
-#if DEBUG
-        .MinimumLevel.Debug()
-#else
-        .MinimumLevel.Information()
-#endif
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-        .Enrich.FromLogContext()
-        .WriteTo.Async(c => c.Console(new JsonFormatter()))
-        .CreateLogger();
+    Log.Logger = new LoggerConfiguration()
+  //#if DEBUG
+  .MinimumLevel.Debug()
+  //#else
+  //        .MinimumLevel.Information()
+  //#endif
+  .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+  .Enrich.FromLogContext()
+  .WriteTo.Async(c => c.Console(new JsonFormatter()))
+  .CreateLogger();
 
     var builder = WebApplication.CreateBuilder(args);
+    var envAsp = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+    if (string.IsNullOrEmpty(envAsp))
+    {
+        envAsp = "Development";
+        Console.WriteLine("Not set Environment Variable - 'ASPNETCORE_ENVIRONMENT'. Default set - 'Development'");
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", envAsp);
+    }
+
     Console.WriteLine(new string('=', 80));
     Console.WriteLine(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
     Console.WriteLine(new string('=', 80));
@@ -59,7 +68,7 @@ try
         var _name = Assembly.GetExecutingAssembly().GetName().Name;
         var _ver = Assembly.GetExecutingAssembly().GetName().Version;
         var env = Environment.GetEnvironmentVariables()["ASPNETCORE_ENVIRONMENT"] ?? "test";
-        
+
         c.SwaggerDoc("v1", new OpenApiInfo
         {
             Title = $"API - {_name}",
@@ -131,15 +140,15 @@ try
     }
 
     app.UseCors(MyAllowSpecificOrigins);
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        //app.UseSwaggerUI(c =>
-        //{
-        //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
-        //});
-    }
+    //if (app.Environment.IsDevelopment())
+    //{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    //app.UseSwaggerUI(c =>
+    //{
+    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Product API V1");
+    //});
+    //}
 
     //app.UseHttpsRedirection();
 

@@ -5,11 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\WebApp</DockerfileContext>
+    <DockerfileContext>..\..</DockerfileContext>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	<Description>Api для тестов</Description>
 	<Title>Api Title</Title>
 	<Version>0.0.0.7</Version>
+	<UserSecretsId>05eb4c0e-0cec-4455-a8fb-9fda5b6482d4</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
