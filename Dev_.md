@@ -42,3 +42,10 @@ docker-compose -f docker-compose.yml -f docker-compose.override.yml up -d
 
 http://localhost:5000/api/users
 ```
+
+
+sh "dotnet tool install dotnet-reportgenerator-globaltool --tool-path ./tools/ -v d"
+https://github.com/topics/jenkinsfile?l=c%23
+[DevSecOps Project with Jenkins ci-cd - DOTNET webapp](https://blog.devops.dev/devsecops-project-with-jenkins-ci-cd-dotnet-webapp-dce678bac835)
+https://medium.com/@postbox.aj99/how-to-monitor-jenkins-using-prometheus-node-exporter-and-grafana-61c449a624e6
+http://localhost:8080/job/test-pipeline/directive-generator/

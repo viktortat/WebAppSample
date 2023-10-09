@@ -365,3 +365,7 @@ src/WebApp.Api/pizzas.db
 src/WebApp.Api/pizzas.db-wal
 src/WebApp.Api/pizzas.db-shm
 .sonarqube/
+
+.test-pipeline.config.json
+test-pipeline.Jenkinsfile
+pipelines/

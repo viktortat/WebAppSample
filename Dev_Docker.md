@@ -27,3 +27,9 @@ docker push registry.gitlab.com/viktortat/appcore50/WebAppApi:001
 docker run --rm -it -p 443:443/tcp -p 8080:80 registry.gitlab.com/viktortat/appcore70/WebAppApi:001  
 http://localhost:8080/  
 ```
+[ow to build smaller and secure Docker Images for .NET](https://www.thorsten-hans.com/how-to-build-smaller-and-secure-docker-images-for-net5/)  
+[Using Azure Files in Kubernetes Deployments with ASP.NET Core](https://www.thorsten-hans.com/using-azure-files-in-kubernetes-deployments-with-asp-net-core/)
+[6 Steps To Run .NET Core Apps In Azure Kubernetes](https://www.thorsten-hans.com/6-steps-to-run-netcore-apps-in-azure-kubernetes/)  
+[Instrumenting .NET Apps with OpenTelemetry](https://www.thorsten-hans.com/instrumenting-dotnet-apps-with-opentelemetry/)  
+[]()  
+[]()  

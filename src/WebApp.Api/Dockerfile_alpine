@@ -1,26 +1,82 @@
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
+# https://www.thorsten-hans.com/how-to-build-smaller-and-secure-docker-images-for-net5/
+FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS publish
 WORKDIR /src
 COPY WebApp.Api.csproj ./
-RUN dotnet restore "./WebApp.Api.csproj"
+
+RUN dotnet restore "./WebApp.Api.csproj" --runtime alpine-x64
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "WebApp.Api.csproj" -c Release -o /app/build
-
-FROM build AS publish
-
-# optimize dotnet publish
 RUN dotnet publish "WebApp.Api.csproj" -c Release -o /app/publish \
+  --no-restore \
   --runtime alpine-x64 \
   --self-contained true \
   /p:PublishTrimmed=true \
   /p:PublishSingleFile=true
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/runtime-deps:7.0-alpine AS final
+
+RUN adduser --disabled-password \
+  --home /app \
+  --gecos '' dotnetuser && chown -R dotnetuser /app
+
+# upgrade musl to remove potential vulnerability
+RUN apk upgrade musl
+
+USER dotnetuser
 WORKDIR /app
+EXPOSE 5000
 COPY --from=publish /app/publish .
-ENTRYPOINT ["./WebApp.Api"]
+
+ENTRYPOINT ["./WebApp.Api", "--urls", "http://localhost:5000"]
+
+# =================================================
+# FROM mcr.microsoft.com/dotnet/aspnet:7.0-alpine AS base
+# WORKDIR /app
+# EXPOSE 80
+# EXPOSE 443
+
+# FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
+# WORKDIR /src
+# COPY WebApp.Api.csproj ./
+# RUN dotnet restore "./WebApp.Api.csproj"
+# COPY . .
+# WORKDIR "/src/."
+# RUN dotnet build "WebApp.Api.csproj" -c Release -o /app/build
+
+# FROM build AS publish
+
+# # optimize dotnet publish
+# RUN dotnet publish "WebApp.Api.csproj" -c Release -o /app/publish \
+#   --runtime alpine-x64 \
+#   --self-contained true \
+#   /p:PublishTrimmed=true \
+#   /p:PublishSingleFile=true
+
+# FROM base AS final
+# WORKDIR /app
+# COPY --from=publish /app/publish .
+# ENTRYPOINT ["./WebApp.Api"]
+# # ==============================================================================
+# # https://didourebai.medium.com/best-practices-to-prepare-net-docker-images-26ce72d5cf7d
+# FROM mcr.microsoft.com/dotnet/sdk:7.0-alpine AS build
+
+# WORKDIR /src
+# COPY ["DockerSample.csproj", "./"]
+# RUN dotnet restore "DockerSample.csproj" -r alpine-x64 /p:PublishReadyToRun=true
+# COPY . .
+# RUN dotnet publish "DockerSample.csproj" --no-restore -c Release -r alpine-x64 -o /app/publish /p:PublishTrimmed=true /p:PublishReadyToRun=true /p:PublishSingleFile=true --self-contained true
+
+# FROM mcr.microsoft.com/dotnet/runtime-deps:7.0-alpine AS final
+# EXPOSE 5000
+# ENV ASPNETCORE_URLS=http://+:5000
+
+# RUN apk add curl
+# HEALTHCHECK CMD curl --fail http://localhost:5000/DockerSample || exit 1 
+
+# RUN adduser --disabled-password --home /app --gecos '' nonroot && chown -R nonroot /app
+# USER nonroot
+
+# WORKDIR /app
+# COPY --from=build /app/publish .
+
+# ENTRYPOINT ["./DockerSample"]
+# # ==============================================================================
